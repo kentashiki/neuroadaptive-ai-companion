@@ -1,0 +1,414 @@
+# Neuroadaptive AI Companion 要件定義書
+
+## 1. 概要
+
+本プロトタイプは、EEGデバイス（Unicorn Hybrid Black）から取得した脳波データをもとに、ユーザの認知状態（覚醒度・集中度）をリアルタイムで推定し、その状態に応じてAIエージェントの振る舞い（発話スタイル・対話内容）を適応的に変化させるシステムである。
+
+本システムの目的は、「ユーザの内的状態に応じてAIが振る舞いを変えるインタラクション」を直感的に体験できるデモを実現することである。
+
+---
+
+## 2. システムの目的
+
+### 2.1 MVPの目的
+
+- EEGデータをLSL経由で取得する
+- EEGから覚醒度（arousal）・集中度（attention）を推定する
+- 推定状態に応じてAIの発話スタイルを変化させる
+- チャット形式のUIでAIとの対話を行う
+- FlaskベースのWebアプリとして動作する
+
+---
+
+### 2.2 デモ体験
+
+ユーザの状態に応じてAIの「人格・話し方」が変わる：
+
+| 状態 | AIの特徴 |
+|------|----------|
+| 高集中 × 高覚醒 | 論理的・簡潔・タスク志向 |
+| 高集中 × 低覚醒 | 落ち着いた説明 |
+| 低集中 × 高覚醒 | 軽い雑談・注意喚起 |
+| 低集中 × 低覚醒 | 優しい・ゆっくり・共感的 |
+
+---
+
+## 3. 技術スタック
+
+### バックエンド
+- Python
+- Flask
+- pylsl
+- numpy
+- scipy
+- threading
+
+### AI
+- OpenAI API（または簡易ルールベース）
+
+### フロントエンド
+- HTML / CSS / JavaScript
+- チャット形式UI
+
+---
+
+## 4. アーキテクチャ
+
+```text
+[Unicorn Hybrid Black]
+        ↓ LSL
+[EEG Receiver]
+        ↓
+[Feature Extractor]
+        ↓
+[State Estimator]
+        ↓
+[AI Companion Agent]
+        ↓
+[Flask API]
+        ↓
+[Chat UI]
+````
+
+---
+
+## 5. コンポーネント仕様
+
+---
+
+## 5.1 EEG Receiver
+
+### 役割
+
+LSLからEEGデータを取得
+
+### 要件
+
+* pylslでストリーム検出
+* リアルタイムデータ取得
+* リングバッファ保持（2〜5秒）
+
+### モード
+
+* Real EEG Mode
+* Dummy Mode（必須）
+
+---
+
+## 5.2 Feature Extractor
+
+### 周波数帯
+
+* theta (4-7 Hz)
+* alpha (8-13 Hz)
+* beta (13-30 Hz)
+
+### 特徴量
+
+```text
+alpha_power
+beta_power
+theta_power
+beta_alpha_ratio
+beta_theta_ratio
+```
+
+---
+
+## 5.3 State Estimator
+
+### 出力
+
+```json
+{
+  "attention": 0.0-1.0,
+  "arousal": 0.0-1.0,
+  "label": "focused | neutral | distracted | low_arousal"
+}
+```
+
+### ルール
+
+```text
+attention = normalize(beta/theta)
+arousal = normalize(beta/alpha)
+```
+
+### 状態分類
+
+```text
+focused: attention > 0.7 and arousal > 0.6
+distracted: attention < 0.5
+low_arousal: arousal < 0.5
+neutral: その他
+```
+
+---
+
+## 5.4 AI Companion Agent
+
+### 役割
+
+ユーザ状態に応じて発話を生成
+
+---
+
+### 入力
+
+```json
+{
+  "user_message": "...",
+  "user_state": {
+    "attention": 0.72,
+    "arousal": 0.3,
+    "label": "low_arousal"
+  }
+}
+```
+
+---
+
+### 出力
+
+```json
+{
+  "response": "ちょっと疲れていそうですね。無理せずゆっくり話しましょう。"
+}
+```
+
+---
+
+### 発話スタイル制御（重要）
+
+```text
+focused:
+  tone: concise, logical, task-oriented
+
+neutral:
+  tone: balanced
+
+distracted:
+  tone: engaging, simple, slightly playful
+
+low_arousal:
+  tone: gentle, slow, supportive, empathetic
+```
+
+---
+
+### 実装方式
+
+#### MVP
+
+* ルールベース + テンプレート
+
+#### 拡張
+
+* LLMプロンプト制御
+
+---
+
+### LLMプロンプト例
+
+```text
+You are an AI companion.
+
+User cognitive state:
+- Attention: {attention}
+- Arousal: {arousal}
+- Label: {label}
+
+Adjust your speaking style:
+- focused → concise and logical
+- distracted → engaging and simple
+- low_arousal → gentle and supportive
+
+Respond to the user message accordingly.
+```
+
+---
+
+## 6. UI要件
+
+### 画面構成
+
+```text
+上部:
+  EEG状態表示
+  - Attention
+  - Arousal
+  - State label
+
+中央:
+  チャット画面
+
+下部:
+  入力欄 + 送信ボタン
+```
+
+---
+
+### 表示要素
+
+* AIメッセージ
+* ユーザメッセージ
+* 状態インジケータ（色変化すると良い）
+
+---
+
+## 7. Flask API
+
+---
+
+### GET `/`
+
+UI表示
+
+---
+
+### GET `/api/state`
+
+現在の状態
+
+---
+
+### POST `/api/chat`
+
+Request:
+
+```json
+{
+  "message": "今日は疲れた"
+}
+```
+
+Response:
+
+```json
+{
+  "response": "無理しすぎないでくださいね。少し休みましょう。"
+}
+```
+
+---
+
+## 8. データ構造
+
+```python
+UserState:
+  attention: float
+  arousal: float
+  label: str
+
+ChatMessage:
+  role: "user" | "assistant"
+  content: str
+  timestamp: float
+```
+
+---
+
+## 9. 動作モード
+
+### Dummy Mode（重要）
+
+* 状態を手動切替できる
+* UIにボタン追加：
+
+  * Focused
+  * Distracted
+  * Low Arousal
+
+---
+
+## 10. 実装優先順位
+
+### Phase 1
+
+* チャットUI
+* ダミー状態切替
+* AI応答（ルールベース）
+
+### Phase 2
+
+* LLM統合
+
+### Phase 3
+
+* EEG接続（LSL）
+
+---
+
+## 11. デモシナリオ
+
+1. ユーザが「今日は疲れた」と入力
+2. 状態を low_arousal に変更
+3. AIが優しく応答
+
+→ 観客「変わった」
+
+4. 状態を focused に変更
+5. AIが論理的に応答
+
+→ 観客「すごい」
+
+---
+
+## 12. 非機能要件
+
+* EEGなしでも動作する
+* 状態変化が視覚的に分かる
+* 応答は1秒以内
+
+---
+
+## 13. ディレクトリ構成
+
+```text
+project/
+  app.py
+
+  eeg/
+    receiver.py
+    feature.py
+    state.py
+
+  agent/
+    companion.py
+
+  templates/
+    index.html
+
+  static/
+    main.js
+    style.css
+```
+
+---
+
+## 14. 完成条件
+
+* チャットUIが動く
+* 状態が表示される
+* 状態によってAIの話し方が変わる
+* Dummy Modeでデモ可能
+
+---
+
+## 15. 発表用メッセージ
+
+このシステムの本質は、
+「ユーザの内的状態をリアルタイムで理解し、それに応じてAIが振る舞いを変える」
+という点にある。
+
+今回は会話で示したが、この仕組みはあらゆるインターフェースに応用可能である。
+
+```
+
+---
+
+必要なら次は：
+
+- 「そのまま使えるFlaskコード」
+- 「LLMプロンプトの最適化」
+- 「UIデザイン（見た目で勝つ）」
