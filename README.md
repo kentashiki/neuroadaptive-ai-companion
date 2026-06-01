@@ -127,3 +127,15 @@ If PowerShell blocks `Activate.ps1`, you can either:
 
 - The app entry point is `app.py`.
 - `main.py` has been removed because it duplicated the same startup behavior.
+
+## Avatar UI Prototype
+
+A React + Vite + TypeScript prototype lives in `avatar-ui/`.
+
+```bash
+cd avatar-ui
+npm install
+npm run dev
+```
+
+Open `http://127.0.0.1:5173` to view the avatar-enabled layout. This first version keeps VRM and EEG integration as future work, but reserves `avatar-ui/public/avatars/` for avatar assets.

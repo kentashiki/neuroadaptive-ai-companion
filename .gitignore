@@ -1,2 +1,8 @@
+__pycache__/
 .env
 instruction.txt
+archive/
+notes/
+.DS_Store
+node_modules/
+dist/

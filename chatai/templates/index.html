@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Neuroadaptive AI Companion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-card brand-card">
+        <p class="eyebrow">デモパネル</p>
+        <h1>Neuroadaptive AI Companion</h1>
+        <p class="sidebar-copy">LSL経由で脳波データを読み取り、集中度を推定して、AI Companionの見た目や口調を切り替えます。</p>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="section-head">
+          <h2>現在の状態</h2>
+          <button id="refreshStateButton" class="secondary-button" type="button">更新</button>
+        </div>
+        <div class="state-grid single">
+          <div class="state-metric">
+            <span>集中度</span>
+            <strong id="attentionValue">0.00</strong>
+          </div>
+        </div>
+        <div id="stateLabel" class="state-pill">散漫</div>
+        <p class="style-note">応答スタイル: <span id="styleDescription">親しみやすい、会話的</span></p>
+        <p class="style-note">応答エンジン: <span id="engineDescription">確認中...</span></p>
+      </div>
+
+      <div class="sidebar-card">
+        <h2>手動状態入力</h2>
+        <div class="demo-buttons">
+          <button type="button" data-state="focused">集中</button>
+          <button type="button" data-state="distracted">散漫</button>
+        </div>
+      </div>
+
+    </aside>
+
+    <main class="chat-layout">
+      <header class="chat-header">
+        <div>
+          <p class="eyebrow">適応型会話</p>
+          <h2>チャット</h2>
+        </div>
+        <button id="resetButton" class="secondary-button" type="button">リセット</button>
+      </header>
+
+      <section id="chatMessages" class="chat-messages"></section>
+
+      <form id="chatForm" class="composer">
+        <textarea id="messageInput" rows="1" placeholder="AI Companionにメッセージを送信..."></textarea>
+        <button type="submit" class="primary-button">送信</button>
+      </form>
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>

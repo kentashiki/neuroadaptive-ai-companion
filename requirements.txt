@@ -1,6 +1,6 @@
 flask
-numpy
-scipy
-pylsl
-openai
+numpy>=1.24
+scipy>=1.10
+pylsl>=1.16
+openai>=1.0.0
 python-dotenv
