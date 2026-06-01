@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FocuSpeed</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="player-panel" aria-label="FocuSpeed audio player">
+        <h1>FocuSpeed</h1>
+
+        <div class="rate-display">
+          <span id="playback-rate">1.00</span><span class="rate-unit">x</span>
+        </div>
+
+        <div class="progress-wrap" aria-label="&#20877;&#29983;&#20301;&#32622;">
+          <div class="time-row">
+            <span id="current-time">0:00</span>
+            <span id="duration">0:00</span>
+          </div>
+          <input id="seek-bar" type="range" min="0" max="1000" value="0" step="1" aria-label="&#20877;&#29983;&#20301;&#32622;">
+        </div>
+
+        <div class="controls">
+          <button id="play-button" class="icon-button" type="button" aria-label="&#20877;&#29983;" title="&#20877;&#29983;">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 5v14l11-7z"></path>
+            </svg>
+          </button>
+          <button id="stop-button" class="icon-button" type="button" aria-label="&#20572;&#27490;" title="&#20572;&#27490;">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 7h10v10H7z"></path>
+            </svg>
+          </button>
+        </div>
+
+        <audio id="audio-player" preload="metadata">
+          <source src="{{ url_for('static', filename='audio/audiobook101.wav') }}" type="audio/wav">
+        </audio>
+
+        <section class="feature-grid" aria-label="&#33075;&#27874;&#29305;&#24500;&#37327;">
+          <article class="feature-card">
+            <span class="feature-label">&#38598;&#20013;&#24230;</span>
+            <strong id="attention">0.000</strong>
+          </article>
+          <article class="feature-card">
+            <span class="feature-label">Alpha</span>
+            <strong id="alpha-power">0.000</strong>
+          </article>
+          <article class="feature-card">
+            <span class="feature-label">Beta</span>
+            <strong id="beta-power">0.000</strong>
+          </article>
+          <article class="feature-card">
+            <span class="feature-label">Theta</span>
+            <strong id="theta-power">0.000</strong>
+          </article>
+          <article class="feature-card">
+            <span class="feature-label">Low Beta</span>
+            <strong id="low-beta-power">0.000</strong>
+          </article>
+          <article class="feature-card">
+            <span class="feature-label">High Beta</span>
+            <strong id="high-beta-power">0.000</strong>
+          </article>
+          <article class="feature-card">
+            <span class="feature-label">A / B</span>
+            <strong id="alpha-beta-ratio">0.000</strong>
+          </article>
+          <article class="feature-card">
+            <span class="feature-label">T / B</span>
+            <strong id="theta-beta-ratio">0.000</strong>
+          </article>
+          <article class="feature-card">
+            <span class="feature-label">T / A</span>
+            <strong id="theta-alpha-ratio">0.000</strong>
+          </article>
+          <article class="feature-card">
+            <span class="feature-label">(T + A) / B</span>
+            <strong id="theta-alpha-over-beta">0.000</strong>
+          </article>
+        </section>
+
+        <section id="raw-eeg-panel" class="raw-eeg-panel is-disconnected" aria-label="LSL EEG raw data plot">
+          <div class="panel-header">
+            <span>EEG Raw</span>
+            <span id="lsl-status" class="status-badge">LSL offline</span>
+          </div>
+          <canvas id="raw-eeg-canvas" width="480" height="190"></canvas>
+          <div id="lsl-overlay" class="lsl-overlay">&#26410;&#25509;&#32154;</div>
+        </section>
+      </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  </body>
+</html>
